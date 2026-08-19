@@ -46,25 +46,23 @@ def post_page(request: Request, post_id: int, db: Annotated[Session, Depends(get
 
 # Function to read all the users     
 @app.get('/users', response_model=list[schemas.UserResponse], status_code=status.HTTP_200_OK)
-def get_users(db: Annotated[Session, Depends(get_db)]):
-    query = db.execute(select(models.User))
-    users = query.scalars().all()
+def get_all_users(db: db_dependency):
+    users = db.execute(select(models.User)).scalars().all()
     if not users:
-        return "That's strange, there are no users..."
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No users found.")
     return users
 
     
 # Function to return a user by id
 @app.get('/users/{user_id}', response_model=schemas.UserResponse, status_code=status.HTTP_200_OK)
 def get_user_by_id(user_id: int, db: db_dependency):
-    query = db.execute(select(models.User).where(models.User.id == user_id))
-    user = query.scalars().first()
+    user= db.execute(select(models.User).where(models.User.id == user_id)).scalars().first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User not found.')
     return user
 
 
-# Function to create an user
+# Function to create a new user
 """
 Corey en este caso usa una validacion de q el username y el email (ambos separados) no existan antes de crear el new_user,
 yo simplemente lo encierro en un try except con IntegrityError, muchos websites tienen verificacion de email como paso final

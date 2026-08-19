@@ -63,8 +63,7 @@ class Post(Base):
     user_id: Mapped[int] = mapped_column(
         # ForeignKey just validates that the ID (the int you passed) is an actual id in the column 'id' of the table 'users'
         ForeignKey("users.id"),
-        nullable=False,
-        index=True,
+        index=True
     )
     date_posted: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
